@@ -1,5 +1,16 @@
+:root {
+    --colour1: #FCDE9C;
+    --colour2: #FFA552;
+    --colour3: #BA5624;
+    --colour4: #381D2A;
+    --colour5: #C4D6B0;
+}
+
 body {
     font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
     text-align: center;
-    background-color: gainsboro;
+    background-color: var(--colour2);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
 }

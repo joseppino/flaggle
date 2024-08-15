@@ -23,6 +23,7 @@
 	"dependencies": {
 		"bulma": "^0.9.4",
 		"purecss": "^3.0.0",
-		"simple-svelte-autocomplete": "^2.5.2"
+		"simple-svelte-autocomplete": "^2.5.2",
+		"svelte-french-toast": "^1.2.0"
 	}
 }

@@ -1,21 +1,80 @@
 <script lang="ts">
     import countriesData from "$lib/countriesData";
     import selectRandomCountry from "$lib/selectRandomCountry";
+    //@ts-ignore
     import AutoComplete from "simple-svelte-autocomplete";
+  import { onMount } from "svelte";
+    import toast, { Toaster } from "svelte-french-toast";
+    import { blur } from 'svelte/transition';
+    import { slide } from 'svelte/transition';
+	import { quintOut } from 'svelte/easing';
+
+    let guessInput: AutoComplete;
+    let guessBtn: HTMLButtonElement;
+    let input: HTMLInputElement;
 
     // convert country names into uppercase for consistency
     const countries = countriesData.map(country => country = {...country, name: country.name.toUpperCase()});
     const countryNames: string[] = countriesData.map(country => country.name.toUpperCase());
     
+    let loaded: boolean = false;
     let country: any = selectRandomCountry();
     let selectedCountryObject: any;
+    let guessed: any[] = [];
     let attempts: number = 0;
+    let gameOver: boolean = false;
+
+    $: if(attempts === 3) { notifyLose() };
+
+    function notifyWin() {
+        toast.success(
+            "Correct!",
+            {
+                duration: 10000,
+                style: 'border-radius: 100px; background: var(--colour5); color: var(--colour4);'
+            }
+        );
+        endGame();
+    }
+
+    function notifyLose() {
+        toast.error(
+            `${country.name.toUpperCase()}`,
+            {
+                duration: 10000,
+                style: 'border-radius: 100px; background: var(--colour5); color: var(--colour4);'
+            }
+        );
+        endGame();
+    }
+
+    function endGame() {
+        guessBtn.classList.add("pure-button-disabled");
+        if(input != null) {
+            input.disabled = true;
+        }
+        guessBtn.disabled = true;
+        gameOver = true;
+    }
+
+    // delay flag load by ~half a second due to odd loading behaviour
+    onMount(() => {
+        //@ts-ignore
+        input = document.querySelector("input");
+        setTimeout(() => {
+            loaded = true;
+        }, 600);
+    })
 </script>
 
+<Toaster />
 <main>
     <h1>Flaggle</h1>
-    <h4>A flag guessing game</h4>
-    <img class="pure-img flag-image" src={`https://flagpedia.net/data/flags/h120/${country.code.toLowerCase()}.webp`} alt="?">
+    {#if loaded}
+        <img class="pure-img flag-image" src={`https://flagpedia.net/data/flags/h120/${country.code.toLowerCase()}.webp`} alt="?">
+    {:else}
+        <p>Loading...</p>
+    {/if}
     <p>ATTEMPTS</p>
     <div class="attempts">
         {#if attempts === 0}
@@ -30,7 +89,7 @@
             <i class="attempt-cross fa-solid fa-square-xmark fa-2xl" style="color: #9d1b1b;"></i>
             <i class="attempt-cross fa-solid fa-square-xmark fa-2xl" style="color: #9d1b1b;"></i>
             <i class="attempt-cross fa-solid fa-square-xmark fa-2xl" style="color: #9c9c9c;"></i>
-        {:else}
+        {:else if attempts > 2}
             <i class="attempt-cross fa-solid fa-square-xmark fa-2xl" style="color: #9d1b1b;"></i> 
             <i class="attempt-cross fa-solid fa-square-xmark fa-2xl" style="color: #9d1b1b;"></i>
             <i class="attempt-cross fa-solid fa-square-xmark fa-2xl" style="color: #9d1b1b;"></i>
@@ -38,21 +97,53 @@
     </div>
     <br>
     <div class="input-container">
-        <AutoComplete items="{countries}" bind:selectedItem="{selectedCountryObject}" labelFieldName="name" />
-        <button class="pure-button" on:click={() => {
-            if(countryNames.includes(selectedCountryObject.name)) {
-                selectedCountryObject.name === country.name.toUpperCase() ? alert("Correct") : attempts += 1;
+        <AutoComplete items="{countries}"
+        bind:this={guessInput}
+        bind:selectedItem="{selectedCountryObject}"
+        labelFieldName="name"
+        hideArrow="true"/>
+        <button class="pure-button"
+        bind:this={guessBtn}
+        on:click={() => {
+            if(guessed.includes(selectedCountryObject.name)) {
+                toast('Already guessed!', {
+                    icon: '⚠️',
+                    style: 'border-radius: 100px; background: var(--colour5); color: var(--colour4);'
+                });
+            } else {
+                if(countryNames.includes(selectedCountryObject.name)) {
+                    if(selectedCountryObject.name === country.name.toUpperCase()) {
+                        notifyWin();
+                    } else {
+                        attempts += 1;
+                        guessed.push(selectedCountryObject.name);
+                        
+                    }
+                }
             }
         }}>GUESS</button>
     </div>
+    {#if gameOver}
+        <button
+        class="pure-button"
+        on:click={() => window.location.reload()}>
+        AGAIN?</button>
+    {/if}
 </main>
 
 <style>
     main {
         display: flex;
         flex-direction: column;
-        justify-content: center;
         align-items: center;
+        width: 600px;
+        max-width: 95vw;
+        background-color: var(--colour1);
+        height: 99vh;
+        min-height: 500px;
+        box-shadow: 10px -2px 4px var(--colour3);
+        margin-top: 5px;
+        color: var(--colour4);
     }
 
     .flag-image {
@@ -64,10 +155,13 @@
         display: flex;
         flex-direction: column;
         align-items: center;
+        margin-top: 10px;
     }
 
     button {
         width: 200px;
+        margin-top: 10px;
+        background-color: var(--colour5);
     }
 
     .attempts {
