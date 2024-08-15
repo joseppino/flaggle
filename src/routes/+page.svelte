@@ -3,11 +3,8 @@
     import selectRandomCountry from "$lib/selectRandomCountry";
     //@ts-ignore
     import AutoComplete from "simple-svelte-autocomplete";
-  import { onMount } from "svelte";
+    import { onMount } from "svelte";
     import toast, { Toaster } from "svelte-french-toast";
-    import { blur } from 'svelte/transition';
-    import { slide } from 'svelte/transition';
-	import { quintOut } from 'svelte/easing';
 
     let guessInput: AutoComplete;
     let guessBtn: HTMLButtonElement;
@@ -155,7 +152,7 @@
         display: flex;
         flex-direction: column;
         align-items: center;
-        margin-top: 10px;
+        margin-top: 20px;
     }
 
     button {
