@@ -6,7 +6,7 @@ ARG TZ=Europe/London
 COPY . /usr/src/app
 RUN apk --no-cache add curl tzdata
 RUN cp /usr/share/zoneinfo/$TZ /etc/localtime && echo $TZ > /etc/timezone
-RUN npm install
+RUN npm install --legacy-peer-deps
 RUN npm run build
 
 FROM node:22-alpine
