@@ -9,6 +9,7 @@
     let guessInput: AutoComplete;
     let guessBtn: HTMLButtonElement;
     let input: HTMLInputElement;
+    let surrenderBtn: HTMLButtonElement;
 
     // convert country names into uppercase for consistency
     const countries = countriesData.map(country => country = {...country, name: country.name.toUpperCase()});
@@ -19,16 +20,27 @@
     let selectedCountryObject: any;
     let guessed: any[] = [];
     let attempts: number = 0;
+    let surrenderClicks: number = 0;
     let gameOver: boolean = false;
 
-    $: if(attempts === 3) { notifyLose() };
+    $: if(attempts === 3) { notifyLose(); }
+
+    $: if(surrenderClicks === 1) { 
+        surrenderBtn.innerText = "REALLY?";
+        setTimeout(() => {
+            surrenderClicks = 0;
+            surrenderBtn.innerText = "GIVE UP?";
+        }, 2000);
+    }
+
+    $: if(surrenderClicks === 2) { attempts = 3; }
 
     function notifyWin() {
         toast.success(
             "Correct!",
             {
                 duration: 10000,
-                style: 'border-radius: 100px; background: var(--colour5); color: var(--colour4);'
+                style: 'border-radius: 100px; color: var(--colour4);'
             }
         );
         endGame();
@@ -38,8 +50,8 @@
         toast.error(
             `${country.name.toUpperCase()}`,
             {
-                duration: 10000,
-                style: 'border-radius: 100px; background: var(--colour5); color: var(--colour4);'
+                duration: 30000,
+                style: 'border-radius: 100px; color: var(--colour4);'
             }
         );
         endGame();
@@ -120,9 +132,18 @@
             }
         }}>GUESS</button>
     </div>
+    {#if !gameOver}
+        <button
+        bind:this={surrenderBtn}
+        class="pure-button"
+        style="background-color: rgba(230, 65, 65, 0.7)"
+        on:click={() => surrenderClicks += 1}
+        >GIVE UP?</button>
+    {/if}
     {#if gameOver}
         <button
         class="pure-button"
+        style="background-color: var(--colour2);"
         on:click={() => window.location.reload()}>
         AGAIN?</button>
     {/if}
