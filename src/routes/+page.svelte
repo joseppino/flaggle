@@ -68,7 +68,7 @@
 <main>
     <h1>Flaggle</h1>
     {#if loaded}
-        <img class="pure-img flag-image" src={`https://flagpedia.net/data/flags/h120/${country.code.toLowerCase()}.webp`} alt="?">
+        <img class="pure-img flag-image" src={`https://flagpedia.net/data/flags/h240/${country.code.toLowerCase()}.webp`} alt="?">
     {:else}
         <p>Loading...</p>
     {/if}
