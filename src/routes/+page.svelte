@@ -117,7 +117,7 @@
             if(guessed.includes(selectedCountryObject.name)) {
                 toast('Already guessed!', {
                     icon: '⚠️',
-                    style: 'border-radius: 100px; background: var(--colour5); color: var(--colour4);'
+                    style: 'border-radius: 100px; color: var(--colour4);'
                 });
             } else {
                 if(countryNames.includes(selectedCountryObject.name)) {
